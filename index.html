@@ -2,9 +2,9 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <style>
         table,
@@ -18,62 +18,143 @@
 </head>
 
 <body>
-    <h3>Aplikasi Pendataan Siswa</h3>
-    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+    <h3>Aplikasi Data Mahasiswa</h3>
+    <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit.</p>
     <div>
-        <input id="name" type="text" placeholder="Isi nama lengkap disini">
-        <input id="school" type="text" placeholder="Isi nama sekolah disini">
+        <input id="name" type="text" placeholder="Isi nama lengkap disini..." />
+        <input id="school" type="text" placeholder="Isi sekolah disini..." />
         <select id="prodi">
             <option>Pilih</option>
             <option value="Manajemen Informatika">Manajemen Informatika</option>
+            <option value="Manajemen Keuangan Perbankan">
+                Manajemen Keuangan Perbankan
+            </option>
             <option value="Administrasi Bisnis">Administrasi Bisnis</option>
         </select>
-        <button id="button">Simpan</button>
+        <button id="button" onclick="saveData()">Simpan</button>
     </div>
-    <table style="margin-top: 1px;">
+    <table style="margin-top: 10px">
         <thead>
-            <th>No</th>
-            <th>Nama</th>
-            <th>Sekolah</th>
-            <th>Program Studi</th>
+            <tr>
+                <th>No</th>
+                <th>Nama</th>
+                <th>Sekolah</th>
+                <th>Program Studi</th>
+                <th colspan="2" style="text-align: center">Action</th>
+            </tr>
         </thead>
-
         <tbody id="result"></tbody>
     </table>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="./axios.min.js"></script>
     <script>
+        //CRUD EDIT
+        const editData = (id, name, school, prodi) => {
+            document.getElementById("name").value = name;
+            document.getElementById("school").value = school;
+            document.getElementById("prodi").value = prodi;
+            document.getElementById("button").innerText = "Ubah";
+            document
+                .getElementById("button")
+                .setAttribute("onclick", `updateData(${id})`);
+        };
+
+        //CRUD UPDATE
+        const updateData = async (id) => {
+            let nameForm = document.getElementById("name").value;
+            let schoolForm = document.getElementById("school").value;
+            let prodiForm = document.getElementById("prodi").value;
+            let text = "Yakin akan mengubah data?";
+            if (confirm(text) == true) {
+                await axios
+                    .patch(`http://localhost:3000/students/${id}`, {
+                        name: nameForm,
+                        school: schoolForm,
+                        prodi: prodiForm,
+                    })
+                    .then((response) => {
+                        console.log(response);
+                    })
+                    .catch((error) => {
+                        console.log(error.message);
+                    });
+            }
+        };
+        // CRUD SAVE
+        const saveData = async () => {
+            let nameForm = document.getElementById("name").value;
+            let schoolForm = document.getElementById("school").value;
+            let prodiForm = document.getElementById("prodi").value;
+            await axios
+                .post(`http://localhost:3000/students`, {
+                    name: nameForm,
+                    school: schoolForm,
+                    prodi: prodiForm,
+                })
+                .then((response) => {
+                    console.log(response);
+                })
+                .catch((error) => {
+                    console.log(error.message);
+                });
+        };
+        // CRUD DELETE
+        const deleteData = async (id) => {
+            let text = "Yakin akan menghapus data?";
+            if (confirm(text) == true) {
+                await axios
+                    .delete(`http://localhost:3000/students/${id}`)
+                    .then((response) => {
+                        console.log(response);
+                    })
+                    .catch((error) => {
+                        console.log(error.message);
+                    });
+            }
+        };
+        // CRUD GET
         const getData = async () => {
-            await axios.get(`http://localhost:3000/students`)
+            await axios
+                .get(`http://localhost:3000/students`)
                 .then((response) => {
                     let bucket = ``;
                     let students = response.data;
                     if (students.length > 0) {
                         for (let i = 0; i < students.length; i++) {
                             bucket += `
-                            <tr>
-                            <td>${i + 1}</td>
-                            <td>${students[i].name}</td>
-                            <td>${students[i].school}</td>
-                            <td>${students[i].prodi}</td>
-                            </tr>
-                            `
+              <tr>
+                <td style="text-align: center">${i + 1}</td>
+                <td>${students[i].name}</td>
+                <td>${students[i].school}</td>
+                <td>${students[i].prodi}</td>
+                  <td>
+                  <button onclick="editData('${students[i].id}','${students[i].name
+                                }','${students[i].school}','${students[i].prodi
+                                }')">Edit</button>
+                </td>
+                <td>
+                  <button onclick="deleteData(${students[i].id
+                                })">Delete</button>
+                </td>
+
+              </tr>
+              `;
                         }
                     } else {
                         bucket += `
-                            <tr>
-                            <td colspan="4" style="text-align: center">Data tidak ditemukan</td>
-                            </tr>   
-                        `
+              <tr>
+                <th colspan="6" style="text-align: center">Data tidak ditemukan</th>
+              </tr>
+            `;
                     }
-                    document.getElementById('result').innerHTML = bucket;
+                    document.getElementById("result").innerHTML = bucket;
                 })
                 .catch((error) => {
                     let bucket = `
-                <tr>
-                <td colspan="4" style="text-align: center">${error.messege}</td>
-                </tr>   
-            `
-                    document.getElementById('result').innerHTML = bucket;
+              <tr>
+                <th colspan="6" style="text-align: center">${error.message}</th>
+              </tr>
+            `;
+                    document.getElementById("result").innerHTML = bucket;
                 });
         };
         getData();
