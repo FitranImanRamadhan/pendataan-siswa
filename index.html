@@ -2,9 +2,9 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
         table,
@@ -18,36 +18,33 @@
 </head>
 
 <body>
-    <h3>Aplikasi Data Mahasiswa</h3>
-    <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit.</p>
+    <h3>Aplikasi Pendataan Siswa</h3>
+    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
     <div>
-        <input id="name" type="text" placeholder="Isi nama lengkap disini..." />
-        <input id="school" type="text" placeholder="Isi sekolah disini..." />
+        <input id="name" type="text" placeholder="Isi nama lengkap disini">
+        <input id="school" type="text" placeholder="Isi nama sekolah disini">
         <select id="prodi">
             <option>Pilih</option>
             <option value="Manajemen Informatika">Manajemen Informatika</option>
-            <option value="Manajemen Keuangan Perbankan">
-                Manajemen Keuangan Perbankan
-            </option>
             <option value="Administrasi Bisnis">Administrasi Bisnis</option>
         </select>
         <button id="button" onclick="saveData()">Simpan</button>
     </div>
-    <table style="margin-top: 10px">
+    <table style="margin-top: 1px;">
         <thead>
-            <tr>
-                <th>No</th>
-                <th>Nama</th>
-                <th>Sekolah</th>
-                <th>Program Studi</th>
-                <th colspan="2" style="text-align: center">Action</th>
-            </tr>
+            <th>No</th>
+            <th>Nama</th>
+            <th>Sekolah</th>
+            <th>Program Studi</th>
+            <th colspan="2" style="text-align: center">Action</th>
         </thead>
+
         <tbody id="result"></tbody>
     </table>
-    <script src="./axios.min.js"></script>
+    <script src="/axios.min.js"></script>
     <script>
-        //CRUD EDIT
+
+        //EDIT
         const editData = (id, name, school, prodi) => {
             document.getElementById("name").value = name;
             document.getElementById("school").value = school;
@@ -58,7 +55,6 @@
                 .setAttribute("onclick", `updateData(${id})`);
         };
 
-        //CRUD UPDATE
         const updateData = async (id) => {
             let nameForm = document.getElementById("name").value;
             let schoolForm = document.getElementById("school").value;
@@ -79,82 +75,82 @@
                     });
             }
         };
-        // CRUD SAVE
+
+
+
+        //SAVE/SIMPAN DATA
         const saveData = async () => {
-            let nameForm = document.getElementById("name").value;
-            let schoolForm = document.getElementById("school").value;
-            let prodiForm = document.getElementById("prodi").value;
-            await axios
-                .post(`http://localhost:3000/students`, {
-                    name: nameForm,
-                    school: schoolForm,
-                    prodi: prodiForm,
-                })
+            let nameForm = document.getElementById('name').value;
+            let schoolForm = document.getElementById('school').value;
+            let prodiForm = document.getElementById('prodi').value;
+            await axios.post(`http://localhost:3000/students`, {
+                name: nameForm,
+                school: schoolForm,
+                prodi: prodiForm
+            })
                 .then((response) => {
                     console.log(response);
                 })
                 .catch((error) => {
-                    console.log(error.message);
+                    console.log(error.messege)
                 });
-        };
-        // CRUD DELETE
+        }
+
+        //DELETE
         const deleteData = async (id) => {
-            let text = "Yakin akan menghapus data?";
+            let text = "Yakin ingin menghapus data?";
             if (confirm(text) == true) {
-                await axios
-                    .delete(`http://localhost:3000/students/${id}`)
+                await axios.delete(`http://localhost:3000/students/${id}`)
                     .then((response) => {
                         console.log(response);
                     })
                     .catch((error) => {
-                        console.log(error.message);
+                        console.log(error.messege)
                     });
             }
-        };
-        // CRUD GET
+
+        }
+
+        // MENGAMPILKAN DATA DARI DATABASE
         const getData = async () => {
-            await axios
-                .get(`http://localhost:3000/students`)
+            await axios.get(`http://localhost:3000/students`)
                 .then((response) => {
                     let bucket = ``;
                     let students = response.data;
+                    console.log(students)
                     if (students.length > 0) {
                         for (let i = 0; i < students.length; i++) {
                             bucket += `
-              <tr>
-                <td style="text-align: center">${i + 1}</td>
-                <td>${students[i].name}</td>
-                <td>${students[i].school}</td>
-                <td>${students[i].prodi}</td>
-                  <td>
-                  <button onclick="editData('${students[i].id}','${students[i].name
-                                }','${students[i].school}','${students[i].prodi
-                                }')">Edit</button>
-                </td>
-                <td>
-                  <button onclick="deleteData(${students[i].id
-                                })">Delete</button>
-                </td>
-
-              </tr>
-              `;
+                            <tr>
+                            <td>${i + 1}</td>
+                            <td>${students[i].name}</td>
+                            <td>${students[i].school}</td>
+                            <td>${students[i].prodi}</td>
+                            <td>
+                                <button onclick="editData('${students[i].id}','${students[i].name}','${students[i].school}','${students[i].prodi}')">Edit</button>
+                                </td>
+                            <td>
+                                <button onclick="deleteData(${students[i].id})">Delete</button>
+                                </td>
+                            </tr>
+                            `
                         }
                     } else {
                         bucket += `
-              <tr>
-                <th colspan="6" style="text-align: center">Data tidak ditemukan</th>
-              </tr>
-            `;
+                            <tr>
+                            <td colspan="5" style="text-align: center">Data tidak ditemukan</td>
+                            </tr>   
+                        `
                     }
-                    document.getElementById("result").innerHTML = bucket;
+                    document.getElementById('result').innerHTML = bucket;
                 })
                 .catch((error) => {
                     let bucket = `
-              <tr>
-                <th colspan="6" style="text-align: center">${error.message}</th>
-              </tr>
-            `;
-                    document.getElementById("result").innerHTML = bucket;
+                <tr>
+                <td colspan="5" style="text-align: center">${error.messege}</td>
+                </tr>   
+            `
+                    document.getElementById('result').innerHTML = bucket;
                 });
         };
         getData();
